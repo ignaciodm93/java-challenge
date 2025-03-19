@@ -1,5 +1,5 @@
 #model
-from eclipse-temurin:23.0.2_7-jdk
+FROM eclipse-temurin:23.0.2_7-jdk-alpine
 
 #container port detail
 expose 8080

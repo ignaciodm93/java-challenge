@@ -2,6 +2,7 @@ package com.ignaciodm.challenge.controllers;
 
 import java.util.List;
 
+import org.redisson.api.RMapReactive;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -20,44 +21,54 @@ import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/selling-points")
-public class SellingPointsController {
+public class SellingPointsController implements SellingPointsApi {
 
-    private final CacheService cacheService;
+	private static final String ERROR_SELLING_POINT_DOESN_T_EXIST = "Error, selling point doesn't exist.";
+	private static final String SELLING_POINT_NOT_FOUND = "Selling point not found.";
+	private static final String SELLING_POINT_DELETED = "Selling point deleted.";
+	private static final String NEW_SELLING_POINT_CREATED = "New selling point created";
+	private static final String ERROR_IDENTIFIER_ALREADY_IN_USE = "Error, identifier already in use.";
+	private final CacheService cacheService;
 
-    public SellingPointsController(CacheService cacheService) {
-        this.cacheService = cacheService;
-    }
+	public SellingPointsController(CacheService cacheService) {
+		this.cacheService = cacheService;
+	}
 
-    @GetMapping("/all")
-    public Mono<ResponseEntity<List<SellingPoint>>> getAll() {
-        return cacheService.getSellingPointsCache().valueIterator().collectList().map(ResponseEntity::ok);
-    }
+	@Override
+	@GetMapping("/all")
+	public Mono<ResponseEntity<List<SellingPoint>>> getAll() {
+		return cacheService.getSellingPointsCache().valueIterator().collectList().map(ResponseEntity::ok);
+	}
 
-    @PostMapping("/add")
-    public Mono<ResponseEntity<String>> add(@RequestBody SellingPoint sellingPoint) {
-        return cacheService.getSellingPointsCache().containsKey(sellingPoint.getId())
-            .flatMap(exists -> {
-                if (exists) {
-                    return Mono.just(ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error, identifier already in use."));
-                } else {
-                    return cacheService.getSellingPointsCache().put(sellingPoint.getId(), sellingPoint).thenReturn(ResponseEntity.status(HttpStatus.CREATED).body("New selling point created"));
-                }
-            }).onErrorResume(e -> Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Unknown error trying to add new selling point.")));
-    }
+	@Override
+	@PostMapping("/add")
+	public Mono<ResponseEntity<String>> add(@RequestBody SellingPoint sellingPoint) {
+		RMapReactive<Integer, SellingPoint> cache = cacheService.getSellingPointsCache();
 
-    @PutMapping("/{id}")
-    public Mono<ResponseEntity<String>> update(@RequestBody SellingPoint sellingPoint) {
-        return cacheService.getSellingPointsCache().containsKey(sellingPoint.getId()).flatMap(exists -> {
-                    if (exists) {
-                        return cacheService.getSellingPointsCache().put(sellingPoint.getId(), sellingPoint).thenReturn(new ResponseEntity<>(HttpStatus.OK));
-                    } else {
-                        return Mono.just(ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error, selling point doesn't exist."));
-                    }
-                });
-    }
+		return cache.containsKey(sellingPoint.getId())
+				.flatMap(exists -> exists ? Mono.just(ResponseEntity.badRequest().body(ERROR_IDENTIFIER_ALREADY_IN_USE))
+						: cache.put(sellingPoint.getId(), sellingPoint)
+								.thenReturn(ResponseEntity.ok(NEW_SELLING_POINT_CREATED)));
+	}
 
-    @DeleteMapping("/{id}")
-    public Mono<ResponseEntity<String>> delete(@PathVariable Integer id) {
-    	return cacheService.getSellingPointsCache().remove(id).flatMap(deletedValue -> Mono.just(ResponseEntity.status(HttpStatus.NO_CONTENT).body("Selling point deleted."))).switchIfEmpty(Mono.just(ResponseEntity.status(HttpStatus.NOT_FOUND).body("Selling point not found.")));
-    }
+	@Override
+	@PutMapping("/{id}")
+	public Mono<ResponseEntity<String>> update(@RequestBody SellingPoint sellingPoint) {
+		return cacheService.getSellingPointsCache().containsKey(sellingPoint.getId()).flatMap(exists -> {
+			if (exists) {
+				return cacheService.getSellingPointsCache().put(sellingPoint.getId(), sellingPoint)
+						.thenReturn(new ResponseEntity<>(HttpStatus.OK));
+			} else {
+				return Mono.just(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ERROR_SELLING_POINT_DOESN_T_EXIST));
+			}
+		});
+	}
+
+	@Override
+	@DeleteMapping("/{id}")
+	public Mono<ResponseEntity<String>> delete(@PathVariable Integer id) {
+		return cacheService.getSellingPointsCache().remove(id).flatMap(
+				deletedValue -> Mono.just(ResponseEntity.status(HttpStatus.NO_CONTENT).body(SELLING_POINT_DELETED)))
+				.switchIfEmpty(Mono.just(ResponseEntity.status(HttpStatus.NOT_FOUND).body(SELLING_POINT_NOT_FOUND)));
+	}
 }
