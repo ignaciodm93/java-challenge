@@ -1,4 +1,4 @@
-package com.iganciodm.challenge.config;
+package com.ignaciodm.challenge.config;
 
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;

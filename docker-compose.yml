@@ -6,6 +6,9 @@ services:
     environment:
       - SPRING_DATA_REDIS_HOST=redis
       - SPRING_DATA_REDIS_PORT=6379
+      - SPRING_DATA_MONGODB_HOST=mongodb
+      - SPRING_DATA_MONGODB_PORT=27017
+      - SPRING_DATA_MONGODB_DATABASE=selling_points_db
     build:
       context: .
       dockerfile: Dockerfile
@@ -16,6 +19,7 @@ services:
       - challenge-network
     depends_on:
       - redis
+      - mongodb
 
   redis:
     image: redis/redis-stack:latest
@@ -27,8 +31,21 @@ services:
     volumes:
       - redis_data:/data
 
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_DATABASE=selling_points_db
+    networks:
+      - challenge-network
+    volumes:
+      - mongodb_data:/data
+
 networks:
   challenge-network:
 
 volumes:
   redis_data:
+  mongodb_data:

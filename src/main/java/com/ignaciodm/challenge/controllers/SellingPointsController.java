@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ignaciodm.challenge.models.SellingPoint;
+import com.ignaciodm.challenge.models.SellingPointDocument;
+import com.ignaciodm.challenge.repository.SellingPointRepository;
 import com.ignaciodm.challenge.service.CacheService;
 
 import reactor.core.publisher.Mono;
@@ -30,8 +32,11 @@ public class SellingPointsController implements SellingPointsApi {
 	private static final String ERROR_IDENTIFIER_ALREADY_IN_USE = "Error, identifier already in use.";
 	private final CacheService cacheService;
 
-	public SellingPointsController(CacheService cacheService) {
+	private SellingPointRepository sellingPointRepository;
+
+	public SellingPointsController(CacheService cacheService, SellingPointRepository sellingPointRepository) {
 		this.cacheService = cacheService;
+		this.sellingPointRepository = sellingPointRepository;
 	}
 
 	@Override
@@ -70,5 +75,16 @@ public class SellingPointsController implements SellingPointsApi {
 		return cacheService.getSellingPointsCache().remove(id).flatMap(
 				deletedValue -> Mono.just(ResponseEntity.status(HttpStatus.NO_CONTENT).body(SELLING_POINT_DELETED)))
 				.switchIfEmpty(Mono.just(ResponseEntity.status(HttpStatus.NOT_FOUND).body(SELLING_POINT_NOT_FOUND)));
+	}
+
+	// ------------------------------------------------------------------------------------------
+
+	@GetMapping("/prueba")
+	public Mono<String> pruebaMongo() {
+		SellingPointDocument testDocument = new SellingPointDocument(1L, "Test Point");
+
+		return sellingPointRepository.save(testDocument)
+				.map(savedDocument -> "ok---------------------- " + savedDocument.toString())
+				.onErrorResume(e -> Mono.just("not ok------------------ " + e.getMessage()));
 	}
 }

@@ -95,8 +95,21 @@
 			<version>${mockito-junit-jupiter.version}</version>
 			<scope>test</scope>
 		</dependency>
-	</dependencies>
 
+		<!-- Mongo y tests de mongo -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-mongodb-reactive</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>de.flapdoodle.embed</groupId>
+			<artifactId>de.flapdoodle.embed.mongo</artifactId>
+			<version>4.6.2</version>
+			<scope>test</scope>
+		</dependency>
+
+	</dependencies>
 	<build>
 		<plugins>
 			<plugin>
