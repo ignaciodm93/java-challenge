@@ -28,12 +28,11 @@ public class RedisConfiguration {
 	public RedissonClient redissonClient() {
 		Config config = new Config();
 		config.setCodec(new JsonJacksonCodec());
-		// para correr la app en docker
-		config.useSingleServer().setAddress(redisAddress + redisHost + redisPort);
+		// para correr la app en docker config.useSingleServer().setAddress(redisAddress
+		// + redisHost + redisPort);
 
 		// para correr la app local
-		// config.useSingleServer().setAddress(redisAddress + redisLocalhost +
-		// redisPort);
+		config.useSingleServer().setAddress(redisAddress + redisLocalhost + redisPort);
 
 		return Redisson.create(config);
 	}
@@ -42,5 +41,4 @@ public class RedisConfiguration {
 	public RedissonReactiveClient createClient(RedissonClient redissonClient) {
 		return redissonClient.reactive();
 	}
-
 }

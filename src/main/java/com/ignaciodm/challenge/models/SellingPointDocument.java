@@ -7,22 +7,22 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class SellingPointDocument {
 
 	@Id
-	private Long id;
+	private int id;
 	private String name;
 
 	public SellingPointDocument() {
 	}
 
-	public SellingPointDocument(Long id, String name) {
+	public SellingPointDocument(int id, String name) {
 		this.id = id;
 		this.name = name;
 	}
 
-	public Long getId() {
+	public int getId() {
 		return id;
 	}
 
-	public void setId(Long id) {
+	public void setId(int id) {
 		this.id = id;
 	}
 

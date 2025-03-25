@@ -2,16 +2,17 @@ package com.ignaciodm.challenge.models;
 
 public class SellingPoint {
 
-	private Integer id;
-	
-	private String name;
-	
-	public SellingPoint() {}
+	private int id;
 
-	public SellingPoint(Integer id, String name) {
-        this.id = id;
-        this.name = name;
-    }
+	private String name;
+
+	public SellingPoint() {
+	}
+
+	public SellingPoint(int id, String name) {
+		this.id = id;
+		this.name = name;
+	}
 
 	public String getName() {
 		return name;

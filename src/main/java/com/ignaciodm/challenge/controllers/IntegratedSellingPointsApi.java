@@ -6,12 +6,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import com.ignaciodm.challenge.models.SellingPoint;
+import com.ignaciodm.challenge.models.SellingPointDocument;
 
 import io.swagger.v3.oas.annotations.Operation;
 import reactor.core.publisher.Mono;
 
-public interface SellingPointsApi {
+public interface IntegratedSellingPointsApi {
 
 	String GET_ALL_SELLING_POINTS_VALUE = "Get all selling points";
 	String GET_ALL_SELLING_POINTS_NOTES = "Returns a list of all registered selling points.";
@@ -23,15 +23,15 @@ public interface SellingPointsApi {
 	String DELETE_SELLING_POINT_NOTES = "Deletes a selling point by its identifier.";
 
 	@Operation(summary = GET_ALL_SELLING_POINTS_VALUE, description = GET_ALL_SELLING_POINTS_NOTES)
-	Mono<ResponseEntity<List<SellingPoint>>> getAll();
+	Mono<ResponseEntity<List<SellingPointDocument>>> getAll();
 
 	@Operation(summary = ADD_SELLING_POINT_VALUE, description = ADD_SELLING_POINT_NOTES)
-	Mono<ResponseEntity<String>> add(@RequestBody SellingPoint sellingPoint);
+	Mono<ResponseEntity<String>> add(@RequestBody SellingPointDocument sellingPointDocument);
 
 	@Operation(summary = UPDATE_SELLING_POINT_VALUE, description = UPDATE_SELLING_POINT_NOTES)
-	Mono<ResponseEntity<String>> update(@RequestBody SellingPoint sellingPoint);
+	Mono<ResponseEntity<String>> update(@RequestBody SellingPointDocument sellingPointDocument);
 
 	@Operation(summary = DELETE_SELLING_POINT_VALUE, description = DELETE_SELLING_POINT_NOTES)
-	Mono<ResponseEntity<String>> delete(@PathVariable Integer id);
+	Mono<ResponseEntity<String>> delete(@PathVariable int id);
 
 }
