@@ -4,7 +4,6 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "sellingPoints")
-//@RedisHash(value = "sellingPoint", timeToLive = 5)
 public class SellingPoint {
 
 	@Id

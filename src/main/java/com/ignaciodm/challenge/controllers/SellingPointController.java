@@ -14,13 +14,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ignaciodm.challenge.models.SellingPoint;
 import com.ignaciodm.challenge.service.SellingPointService;
+import com.ignaciodm93.interfaces.SellingPointApi;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/selling-points")
-public class SellingPointController {
+public class SellingPointController implements SellingPointApi {
 
 	@Autowired
 	private SellingPointService sellingPointService;

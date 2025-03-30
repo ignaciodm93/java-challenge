@@ -26,6 +26,7 @@ public class SellingPointService {
 
 	private static final Logger logger = LoggerFactory.getLogger(SellingPointService.class);
 
+	// pasar los textos a constantes luego
 	public Flux<SellingPoint> findAll() {
 		logger.info("Intentando obtener todos los SellingPoints de Redis.");
 

@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/accreditations")
 public class AccreditationsController {
-
+// se comenta por el momento para que no interfiera con la refactorización
 //	@Autowired
 //	private AccreditationRedisService accreditationRedisService;
 //
@@ -27,5 +27,4 @@ public class AccreditationsController {
 //		return accreditationRedisService.deleteAccreditation(key).map(ResponseEntity::ok);
 //	}
 
-	// ... otros métodos ...
 }
