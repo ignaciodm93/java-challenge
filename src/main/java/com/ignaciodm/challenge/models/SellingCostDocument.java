@@ -1,10 +1,12 @@
 package com.ignaciodm.challenge.models;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import java.io.Serializable;
 
-@Document(collection = "sellingCosts")
-public class SellingCostDocument {
+import org.springframework.data.annotation.Id;
+import org.springframework.data.redis.core.RedisHash;
+
+@RedisHash("SellingCost")
+public class SellingCostDocument implements Serializable {
 
 	@Id
 	private int id;

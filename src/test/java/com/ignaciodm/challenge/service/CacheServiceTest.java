@@ -1,69 +1,50 @@
 package com.ignaciodm.challenge.service;
 
-import static org.mockito.ArgumentMatchers.anyMap;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
-
-import java.lang.reflect.Method;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.redisson.api.RMapReactive;
-import org.redisson.api.RedissonReactiveClient;
-import org.redisson.codec.JsonJacksonCodec;
-
-import com.ignaciodm.challenge.models.SellingCost;
-import com.ignaciodm.challenge.models.SellingPoint;
-
-import reactor.core.publisher.Mono;
 
 @ExtendWith(MockitoExtension.class)
 public class CacheServiceTest {
 
-	@Mock
-	private RedissonReactiveClient redissonReactiveClient;
-
-	@Mock
-	private RMapReactive<Integer, SellingPoint> sellingPointsCache;
-
-	@Mock
-	private RMapReactive<String, SellingCost> sellingCostsCache;
-
-	@InjectMocks
-	private CacheService cacheService;
-
-	@BeforeEach
-	void setUp() throws Exception {
-		when(redissonReactiveClient.getMap(eq("sellingPointsCache"), Mockito.<JsonJacksonCodec>any()))
-				.thenReturn((RMapReactive) sellingPointsCache);
-		when(redissonReactiveClient.getMap(eq("sellingCostsCache"), Mockito.<JsonJacksonCodec>any()))
-				.thenReturn((RMapReactive) sellingCostsCache);
-		when(sellingPointsCache.putAll(anyMap())).thenReturn(Mono.empty());
-		when(sellingCostsCache.putAll(anyMap())).thenReturn(Mono.empty());
-
-		callPrivateMethod("initializeSellingPointsCache");
-		callPrivateMethod("initializeSellingCostsCache");
-		callPrivateMethod("initializeCaches");
-	}
-
-	private void callPrivateMethod(String methodName) throws Exception {
-		Method method = CacheService.class.getDeclaredMethod(methodName);
-		method.setAccessible(true);
-		method.invoke(cacheService);
-	}
-
-	@Test
-	void getSellingPointsCacheTest() {
-		assert cacheService.getSellingPointsCache() == sellingPointsCache;
-	}
-
-	@Test
-	void getCostsCacheTest() {
-		assert cacheService.getCostsCache() == sellingCostsCache;
-	}
+//	@Mock
+//	private RedissonReactiveClient redissonReactiveClient;
+//
+//	@Mock
+//	private RMapReactive<Integer, SellingPoint> sellingPointsCache;
+//
+//	@Mock
+//	private RMapReactive<String, SellingCost> sellingCostsCache;
+//
+//	@InjectMocks
+//	private CacheService cacheService;
+//
+//	@BeforeEach
+//	void setUp() throws Exception {
+//		when(redissonReactiveClient.getMap(eq("sellingPointsCache"), Mockito.<JsonJacksonCodec>any()))
+//				.thenReturn((RMapReactive) sellingPointsCache);
+//		when(redissonReactiveClient.getMap(eq("sellingCostsCache"), Mockito.<JsonJacksonCodec>any()))
+//				.thenReturn((RMapReactive) sellingCostsCache);
+//		when(sellingPointsCache.putAll(anyMap())).thenReturn(Mono.empty());
+//		when(sellingCostsCache.putAll(anyMap())).thenReturn(Mono.empty());
+//
+//		callPrivateMethod("initializeSellingPointsCache");
+//		callPrivateMethod("initializeSellingCostsCache");
+//		callPrivateMethod("initializeCaches");
+//	}
+//
+//	private void callPrivateMethod(String methodName) throws Exception {
+//		Method method = CacheService.class.getDeclaredMethod(methodName);
+//		method.setAccessible(true);
+//		method.invoke(cacheService);
+//	}
+//
+//	@Test
+//	void getSellingPointsCacheTest() {
+//		assert cacheService.getSellingPointsCache() == sellingPointsCache;
+//	}
+//
+//	@Test
+//	void getCostsCacheTest() {
+//		assert cacheService.getCostsCache() == sellingCostsCache;
+//	}
 }

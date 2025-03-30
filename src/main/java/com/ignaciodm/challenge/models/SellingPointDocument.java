@@ -1,36 +1,37 @@
 package com.ignaciodm.challenge.models;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import java.io.Serializable;
 
-@Document(collection = "sellingPoints")
-public class SellingPointDocument {
+import org.springframework.data.redis.core.RedisHash;
 
-	@Id
-	private int id;
-	private String name;
+@RedisHash("SellingPoint")
+public class SellingPointDocument implements Serializable {
 
-	public SellingPointDocument() {
-	}
-
-	public SellingPointDocument(int id, String name) {
-		this.id = id;
-		this.name = name;
-	}
-
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
+//	@Id
+//	private int id;
+//	private String name;
+//
+//	public SellingPointDocument() {
+//	}
+//
+//	public SellingPointDocument(int id, String name) {
+//		this.id = id;
+//		this.name = name;
+//	}
+//
+//	public int getId() {
+//		return id;
+//	}
+//
+//	public void setId(int id) {
+//		this.id = id;
+//	}
+//
+//	public String getName() {
+//		return name;
+//	}
+//
+//	public void setName(String name) {
+//		this.name = name;
+//	}
 }

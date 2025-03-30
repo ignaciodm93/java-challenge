@@ -2,8 +2,10 @@ package com.ignaciodm.challenge.repository;
 
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 
-import com.ignaciodm.challenge.models.SellingPointDocument;
+import com.ignaciodm.challenge.models.SellingPoint;
 
-public interface SellingPointRepository extends ReactiveMongoRepository<SellingPointDocument, Integer> {
+import reactor.core.publisher.Mono;
 
+public interface SellingPointRepository extends ReactiveMongoRepository<SellingPoint, Integer> {
+	Mono<SellingPoint> findById(Integer id);
 }
