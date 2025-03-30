@@ -1,7 +1,10 @@
 package com.ignaciodm.challenge.service;
 
+import java.time.Duration;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -21,17 +24,33 @@ public class SellingPointService {
 	@Autowired
 	private SellingPointRepository sellingPointRepository;
 
+	private static final Logger logger = LoggerFactory.getLogger(SellingPointService.class);
+
 	public Flux<SellingPoint> findAll() {
-		return redisTemplate.keys("sellingPoint:*").collectList().flatMapMany(
-				keys -> redisTemplate.opsForValue().multiGet(keys).flatMapIterable(sellingPoints -> sellingPoints))
-				.switchIfEmpty(sellingPointRepository.findAll().flatMap(sellingPoint -> redisTemplate.opsForValue()
-						.set("sellingPoint:" + sellingPoint.getId(), sellingPoint).thenReturn(sellingPoint)));
+		logger.info("Intentando obtener todos los SellingPoints de Redis.");
+
+		return redisTemplate.opsForList().range("sellingPointsList", 0, -1)
+				.switchIfEmpty(sellingPointRepository.findAll().collectList().flatMapMany(sellingPoints -> {
+					logger.info("SellingPoints no encontrados en Redis. Obteniendo de MongoDB y guardando en Redis.");
+					return redisTemplate.opsForList().rightPushAll("sellingPointsList", sellingPoints)
+							.then(redisTemplate.expire("sellingPointsList", Duration.ofSeconds(10)))
+							.thenMany(Flux.fromIterable(sellingPoints));
+				}));
 	}
 
 	public Mono<SellingPoint> findById(Integer id) {
-		return redisTemplate.opsForValue().get("sellingPoint:" + id)
-				.switchIfEmpty(sellingPointRepository.findById(id).flatMap(sellingPoint -> redisTemplate.opsForValue()
-						.set("sellingPoint:" + sellingPoint.getId(), sellingPoint).thenReturn(sellingPoint)));
+		String key = "sellingPoint:" + id;
+		logger.info("Intentando obtener SellingPoint de Redis con clave: {}", key);
+
+		Mono<SellingPoint> redisValue = redisTemplate.opsForValue().get(key);
+
+		Mono<SellingPoint> mongoValue = sellingPointRepository.findById(id).flatMap(sellingPoint -> {
+			logger.info("No se encontró en redis. Obteniendo de MongoDB y guardando en Redis.");
+			return redisTemplate.opsForValue().set(key, sellingPoint, Duration.ofSeconds(10)).thenReturn(sellingPoint);
+		});
+
+		return redisValue.switchIfEmpty(mongoValue)
+				.doOnNext(sellingPoint -> logger.info("SellingPoint encontrado: {}", sellingPoint));
 	}
 
 	public Mono<SellingPoint> save(SellingPoint sellingPoint) {
