@@ -18,6 +18,20 @@ import reactor.core.publisher.Mono;
 @Service
 public class SellingPointService {
 
+	private static final String LOG_SELLING_POINT_NOT_FOUNDED_ON_REDIS_GETTING_FROM_DB = "Selling point not founded on Redis. Getting it from db and storing it on redis...";
+
+	private static final String LOG_FOUNDED_SELLING_POINT = "SellingPoint encontrado: {}";
+
+	private static final String REDIS_KEY_SELLING_POINTS_LIST = "sellingPointsList";
+
+	private static final String LOG_TRYING_TO_GET_SELLING_POINT_WITH_KEY = "Trying to get selling point with key: {}";
+
+	private static final String REDIS_KEY_SELLING_POINT_KEY = "sellingPoint:";
+
+	private static final String FOUNDED_DATA_ON_REDIS = "Founded data on Redis: ";
+
+	private static final String TRYING_TO_GET_SELLING_POINTS_FROM_REDIS = "Trying to get selling points from Redis.";
+
 	@Autowired
 	private ReactiveRedisTemplate<String, SellingPoint> redisTemplate;
 
@@ -26,37 +40,43 @@ public class SellingPointService {
 
 	private static final Logger logger = LoggerFactory.getLogger(SellingPointService.class);
 
-	// pasar los textos a constantes luego
 	public Flux<SellingPoint> findAll() {
-		logger.info("Intentando obtener todos los SellingPoints de Redis.");
+		logger.info(TRYING_TO_GET_SELLING_POINTS_FROM_REDIS);
 
-		return redisTemplate.opsForList().range("sellingPointsList", 0, -1)
+		redisTemplate.opsForList().range(REDIS_KEY_SELLING_POINTS_LIST, 0, -1).subscribe(isEmpty -> {
+			logger.info("redisList is empty: {}", isEmpty);
+		});
+
+		return redisTemplate.opsForList().range(REDIS_KEY_SELLING_POINTS_LIST, 0, -1)
+				.doOnNext(sellingPoint -> System.out.println(FOUNDED_DATA_ON_REDIS + sellingPoint))
 				.switchIfEmpty(sellingPointRepository.findAll().collectList().flatMapMany(sellingPoints -> {
-					logger.info("SellingPoints no encontrados en Redis. Obteniendo de MongoDB y guardando en Redis.");
-					return redisTemplate.opsForList().rightPushAll("sellingPointsList", sellingPoints)
-							.then(redisTemplate.expire("sellingPointsList", Duration.ofSeconds(10)))
+					logger.info(LOG_SELLING_POINT_NOT_FOUNDED_ON_REDIS_GETTING_FROM_DB);
+					return redisTemplate.opsForList().rightPushAll(REDIS_KEY_SELLING_POINTS_LIST, sellingPoints)
+							.then(redisTemplate.expire(REDIS_KEY_SELLING_POINTS_LIST, Duration.ofSeconds(10000)))
 							.thenMany(Flux.fromIterable(sellingPoints));
 				}));
 	}
 
 	public Mono<SellingPoint> findById(Integer id) {
-		String key = "sellingPoint:" + id;
-		logger.info("Intentando obtener SellingPoint de Redis con clave: {}", key);
+		String key = REDIS_KEY_SELLING_POINT_KEY + id;
+		logger.info(LOG_TRYING_TO_GET_SELLING_POINT_WITH_KEY, key);
 
 		Mono<SellingPoint> redisValue = redisTemplate.opsForValue().get(key);
 
 		Mono<SellingPoint> mongoValue = sellingPointRepository.findById(id).flatMap(sellingPoint -> {
-			logger.info("No se encontró en redis. Obteniendo de MongoDB y guardando en Redis.");
+			logger.info(LOG_SELLING_POINT_NOT_FOUNDED_ON_REDIS_GETTING_FROM_DB);
 			return redisTemplate.opsForValue().set(key, sellingPoint, Duration.ofSeconds(10)).thenReturn(sellingPoint);
 		});
 
 		return redisValue.switchIfEmpty(mongoValue)
-				.doOnNext(sellingPoint -> logger.info("SellingPoint encontrado: {}", sellingPoint));
+				.doOnNext(sellingPoint -> logger.info(LOG_FOUNDED_SELLING_POINT, sellingPoint));
 	}
 
 	public Mono<SellingPoint> save(SellingPoint sellingPoint) {
-		return sellingPointRepository.save(sellingPoint).flatMap(savedSellingPoint -> redisTemplate.opsForValue()
-				.set("sellingPoint:" + savedSellingPoint.getId(), savedSellingPoint).thenReturn(savedSellingPoint));
+		return sellingPointRepository.save(sellingPoint)
+				.flatMap(savedSellingPoint -> redisTemplate.opsForValue()
+						.set(REDIS_KEY_SELLING_POINT_KEY + savedSellingPoint.getId(), savedSellingPoint)
+						.thenReturn(savedSellingPoint));
 	}
 
 	public Mono<SellingPoint> update(Integer id, SellingPoint sellingPoint) {
@@ -64,13 +84,16 @@ public class SellingPointService {
 			sellingPoint.setId(id);
 			return sellingPointRepository.save(sellingPoint)
 					.flatMap(updatedSellingPoint -> redisTemplate.opsForValue()
-							.set("sellingPoint:" + updatedSellingPoint.getId(), updatedSellingPoint)
+							.set(REDIS_KEY_SELLING_POINT_KEY + updatedSellingPoint.getId(), updatedSellingPoint)
 							.thenReturn(updatedSellingPoint));
-		});
+		}).switchIfEmpty(Mono.empty());
 	}
 
 	public Mono<Long> deleteById(Integer id) {
-		return sellingPointRepository.deleteById(id).then(redisTemplate.delete("sellingPoint:" + id));
+		return sellingPointRepository.findById(id)
+				.flatMap(existingSellingPoint -> sellingPointRepository.deleteById(id)
+						.then(redisTemplate.delete(REDIS_KEY_SELLING_POINT_KEY + id)).thenReturn(1L))
+				.switchIfEmpty(Mono.just(0L));
 	}
 
 	public Mono<Void> saveInitialData() {

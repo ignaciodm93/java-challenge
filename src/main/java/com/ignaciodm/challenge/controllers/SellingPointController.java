@@ -39,20 +39,36 @@ public class SellingPointController implements SellingPointApi {
 
 	@PostMapping
 	public Mono<ResponseEntity<SellingPoint>> createSellingPoint(@RequestBody SellingPoint sellingPoint) {
-		return sellingPointService.save(sellingPoint)
-				.map(savedSellingPoint -> ResponseEntity.status(HttpStatus.CREATED).body(sellingPoint));
+		return sellingPointService.findById(sellingPoint.getId())
+				.flatMap(existingSellingPoint -> Mono
+						.just(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new SellingPoint())))
+				.switchIfEmpty(sellingPointService.save(sellingPoint)
+						.map(savedSellingPoint -> ResponseEntity.status(HttpStatus.CREATED).body(savedSellingPoint)))
+				.map(responseEntity -> {
+					if (responseEntity.getStatusCode() == HttpStatus.BAD_REQUEST) {
+						return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+					}
+					return responseEntity;
+				});
 	}
 
 	@PutMapping("/{id}")
 	public Mono<ResponseEntity<SellingPoint>> updateSellingPoint(@PathVariable Integer id,
 			@RequestBody SellingPoint sellingPoint) {
-		return sellingPointService.update(id, sellingPoint).map(updatedSellingPoint -> ResponseEntity.ok(sellingPoint))
-				.defaultIfEmpty(ResponseEntity.notFound().build());
+		return sellingPointService.update(id, sellingPoint)
+				.map(updatedSellingPoint -> ResponseEntity.ok(updatedSellingPoint))
+				.switchIfEmpty(Mono.just(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null)));
 	}
 
 	@DeleteMapping("/{id}")
 	public Mono<ResponseEntity<Void>> deleteSellingPoint(@PathVariable Integer id) {
-		return sellingPointService.deleteById(id).then(Mono.just(ResponseEntity.noContent().build()));
+		return sellingPointService.deleteById(id).map(result -> {
+			if (result == 1L) {
+				return ResponseEntity.status(HttpStatus.OK).build();
+			} else {
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+			}
+		});
 	}
 
 	@PostMapping("/initial-data")
