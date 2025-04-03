@@ -12,3 +12,5 @@ Maven: Para la gestión de dependencias.
 JUnit 5 y Mockito: Para las pruebas unitarias.  
 SpringDoc (Swagger): Para la documentación de la API.  
 Java 23: El lenguaje de programación utilizado.
+
+actualizar readme luego

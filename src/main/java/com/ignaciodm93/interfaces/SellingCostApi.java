@@ -3,7 +3,6 @@ package com.ignaciodm93.interfaces;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -23,13 +22,11 @@ public interface SellingCostApi {
 	@Operation(summary = GET_DIRECT_CONNECTION_VALUE, description = GET_DIRECT_CONNECTION_NOTES, responses = {
 			@ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = Map.class))),
 			@ApiResponse(responseCode = "404", description = "Not Found", content = @Content(schema = @Schema(implementation = Map.class))) })
-	@GetMapping("/direct-connection")
-	Mono<ResponseEntity<Map<Integer, Integer>>> getDirectConnection(
+	Mono<ResponseEntity<Map<Integer, Integer>>> getDirectConnections(
 			@Parameter(description = "Selling point ID to discover paths", required = true) @RequestParam Integer sellingPointToDiscoverPathsId);
 
 	@Operation(summary = GET_CHEAPEST_PATH_VALUE, description = GET_CHEAPEST_PATH_NOTES, responses = {
 			@ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = Object.class))) })
-	@GetMapping("/full-cheapest-path")
 	Mono<ResponseEntity<Map<String, Object>>> getFullCheapestPath(
 			@Parameter(description = "Starting point ID", required = true) @RequestParam Integer startingPoint,
 			@Parameter(description = "Ending point ID", required = true) @RequestParam Integer endingPoint);

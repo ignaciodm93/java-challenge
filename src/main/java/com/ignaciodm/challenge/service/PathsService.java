@@ -18,11 +18,6 @@ public class PathsService {
 	private static final String FINAL_FARE = "final fare: ";
 	private static final String PATH = "path: ";
 
-	public Mono<Map<Integer, Integer>> getDirectConnection(Map<Integer, Map<Integer, Integer>> sellingPointsPaths,
-			int sellingPoint) {
-		return Mono.just(sellingPointsPaths.getOrDefault(sellingPoint, new HashMap<>()));
-	}
-
 	public Mono<Map<String, Object>> getFullCheapestPath(Map<Integer, Map<Integer, Integer>> sellingPointsPaths,
 			Integer startingPoint, Integer endingPoint) {
 		return Mono.fromCallable(() -> {

@@ -15,7 +15,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,6 +35,8 @@ import reactor.core.publisher.Mono;
 @RestController
 @RequestMapping("/selling-costs")
 public class SellingCostController implements SellingCostApi {
+
+	private static final int REDIS_TTL = 300;
 
 	@Autowired
 	private PathsService integratedPathService;
@@ -66,31 +71,79 @@ public class SellingCostController implements SellingCostApi {
 		});
 	}
 
-	// arreglar---------------------------------------------------------------------------------
-	@Override
-	@GetMapping("/direct-connection")
-	public Mono<ResponseEntity<Map<Integer, Integer>>> getDirectConnection(
-			@RequestParam Integer sellingPointToDiscoverPathsId) {
-		String key = "directConnections:" + sellingPointToDiscoverPathsId;
-		Mono<Map<Integer, Integer>> redisData = redisTemplateSellingCost.opsForValue().get(key);
-		Mono<ResponseEntity<Map<Integer, Integer>>> redisMono = redisData.map(ResponseEntity::ok)
-				.defaultIfEmpty(ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of()));
-
-		Mono<Map<Integer, Integer>> mongoData = getSellingPointsPaths().flatMap(sellingPointsPaths -> {
-
-			log.debug("Fetching direct connections for sellingPoint {}", sellingPointToDiscoverPathsId);
-			return integratedPathService.getDirectConnection(sellingPointsPaths, sellingPointToDiscoverPathsId)
-					.doOnNext(directConnections -> {
-						log.debug("Direct connections found: {}", directConnections);
-					}).flatMap(directConnections -> {
-						return redisTemplateSellingCost.opsForValue()
-								.set(key, directConnections, Duration.ofSeconds(60)).thenReturn(directConnections);
-					});
-		});
-
-		return redisMono.switchIfEmpty(mongoData.map(ResponseEntity::ok));
+	@PostMapping("/add-selling-cost")
+	public Mono<ResponseEntity<SellingCost>> addSellingCost(@RequestBody SellingCost sellingCost) {
+		return sellingCostDocumentRepository.save(sellingCost)
+				.map(savedSellingCost -> ResponseEntity.status(HttpStatus.CREATED).body(savedSellingCost));
 	}
-	// fin_arreglar---------------------------------------------------------------------------------
+
+	@PutMapping("edit-existing-selling-cost/{startingPoint}/{endingPoint}")
+	public Mono<ResponseEntity<SellingCost>> updateSellingCost(@PathVariable Integer startingPoint,
+			@PathVariable Integer endingPoint, @RequestBody SellingCost sellingCost) {
+
+		String redisKey = "directConnections:" + startingPoint;
+
+		return sellingCostDocumentRepository.findByStartingPointAndEndingPoint(startingPoint, endingPoint)
+				.flatMap(existingSellingCost -> {
+					existingSellingCost.setCost(sellingCost.getCost());
+					return sellingCostDocumentRepository.save(existingSellingCost).flatMap(updatedSellingCost -> {
+						return redisTemplateSellingCost.opsForValue().get(redisKey).flatMap(directConnections -> {
+							if (directConnections == null) {
+								directConnections = new HashMap<>();
+							}
+							directConnections.put(endingPoint, updatedSellingCost.getCost());
+							return redisTemplateSellingCost.opsForValue()
+									.set(redisKey, directConnections, Duration.ofSeconds(REDIS_TTL))
+									.thenReturn(ResponseEntity.ok(updatedSellingCost));
+						}).switchIfEmpty(Mono.defer(() -> {
+							Map<Integer, Integer> newMap = new HashMap<>();
+							newMap.put(endingPoint, updatedSellingCost.getCost());
+							return redisTemplateSellingCost.opsForValue()
+									.set(redisKey, newMap, Duration.ofSeconds(REDIS_TTL))
+									.thenReturn(ResponseEntity.ok(updatedSellingCost));
+						}));
+					});
+				}).switchIfEmpty(Mono.just(ResponseEntity.notFound().build()));
+	}
+
+	@DeleteMapping("delete-selling-cost/{startingPoint}/{endingPoint}")
+	public Mono<ResponseEntity<Object>> deleteSellingCost(@PathVariable Integer startingPoint,
+			@PathVariable Integer endingPoint) {
+
+		String redisKey = "directConnections:" + startingPoint;
+
+		return sellingCostDocumentRepository.findByStartingPointAndEndingPoint(startingPoint, endingPoint)
+				.flatMap(existingSellingCost -> {
+					return sellingCostDocumentRepository.delete(existingSellingCost)
+							.then(redisTemplateSellingCost.opsForValue().get(redisKey).flatMap(directConnections -> {
+								if (directConnections != null) {
+									directConnections.remove(endingPoint);
+									return redisTemplateSellingCost.delete(redisKey)
+											.thenReturn(ResponseEntity.noContent().build());
+								} else {
+									return Mono.just(ResponseEntity.noContent().build());
+								}
+							}));
+				}).switchIfEmpty(Mono.just(ResponseEntity.notFound().build()));
+	}
+
+	// ok para una direccion
+	@GetMapping("/direct-connections/{startingPoint}")
+	public Mono<ResponseEntity<Map<Integer, Integer>>> getDirectConnections(@PathVariable Integer startingPoint) {
+
+		String redisKey = "directConnections:" + startingPoint;
+
+		return redisTemplateSellingCost.opsForValue().get(redisKey)
+				.switchIfEmpty(sellingCostDocumentRepository.findByStartingPoint(startingPoint)
+						.collectMap(SellingCost::getEndingPoint, SellingCost::getCost).flatMap(connections -> {
+							if (connections.isEmpty()) {
+								return Mono.empty();
+							}
+							return redisTemplateSellingCost.opsForValue()
+									.set(redisKey, connections, Duration.ofSeconds(REDIS_TTL)).thenReturn(connections);
+						}))
+				.map(connections -> ResponseEntity.ok(connections)).defaultIfEmpty(ResponseEntity.notFound().build());
+	}
 
 	@Override
 	@GetMapping("/full-cheapest-path")
@@ -110,7 +163,8 @@ public class SellingCostController implements SellingCostApi {
 						log.debug("Cheapest path found: {}", pathAndFare);
 					}).flatMap(pathAndFare -> {
 						// a redis
-						return redisTemplateCheapestPath.opsForValue().set(key, pathAndFare, Duration.ofSeconds(60))
+						return redisTemplateCheapestPath.opsForValue()
+								.set(key, pathAndFare, Duration.ofSeconds(REDIS_TTL))
 								.thenReturn(ResponseEntity.ok(pathAndFare));
 					});
 		});
@@ -133,7 +187,8 @@ public class SellingCostController implements SellingCostApi {
 					});
 
 					String redisKey = "sellingCostsData";
-					return redisTemplateCheapestPath.opsForValue().set(redisKey, sellingCostMap, Duration.ofHours(1))
+					return redisTemplateCheapestPath.opsForValue()
+							.set(redisKey, sellingCostMap, Duration.ofSeconds(300))
 							.thenReturn(ResponseEntity.status(HttpStatus.CREATED)
 									.body("Initial selling costs saved successfully and cached in Redis."));
 				}));
