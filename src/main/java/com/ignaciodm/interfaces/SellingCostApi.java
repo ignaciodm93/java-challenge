@@ -1,4 +1,4 @@
-package com.ignaciodm93.interfaces;
+package com.ignaciodm.interfaces;
 
 import java.util.Map;
 

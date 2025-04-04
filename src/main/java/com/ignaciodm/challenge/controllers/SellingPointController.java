@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ignaciodm.challenge.models.SellingPoint;
 import com.ignaciodm.challenge.service.SellingPointService;
-import com.ignaciodm93.interfaces.SellingPointApi;
+import com.ignaciodm.interfaces.SellingPointApi;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
