@@ -150,27 +150,19 @@ public class SellingCostController implements SellingCostApi {
 	public Mono<ResponseEntity<Map<String, Object>>> getFullCheapestPath(@RequestParam Integer startingPoint,
 			@RequestParam Integer endingPoint) {
 		String key = "cheapestPath:" + startingPoint + "-" + endingPoint;
-
-		// intentamos tomarlo de redis
 		Mono<ResponseEntity<Map<String, Object>>> redisMono = redisTemplateCheapestPath.opsForValue().get(key)
 				.map(ResponseEntity::ok);
-
-		// si no lo encontramos en Redis, lo calculamos y lo almacenamos
 		Mono<ResponseEntity<Map<String, Object>>> mongoMono = getSellingPointsPaths().flatMap(sellingPointsPaths -> {
 			log.debug("Fetching full cheapest path from {} to {}", startingPoint, endingPoint);
 			return integratedPathService.getFullCheapestPath(sellingPointsPaths, startingPoint, endingPoint)
 					.doOnNext(pathAndFare -> {
 						log.debug("Cheapest path found: {}", pathAndFare);
 					}).flatMap(pathAndFare -> {
-						// a redis
 						return redisTemplateCheapestPath.opsForValue()
 								.set(key, pathAndFare, Duration.ofSeconds(REDIS_TTL))
 								.thenReturn(ResponseEntity.ok(pathAndFare));
 					});
 		});
-
-		// evaluamos si esta en la primera consulta de redis, si no hacemos toda la
-		// movida de mongo, y redis desde 0
 		return redisMono.switchIfEmpty(mongoMono).defaultIfEmpty(ResponseEntity.notFound().build());
 	}
 

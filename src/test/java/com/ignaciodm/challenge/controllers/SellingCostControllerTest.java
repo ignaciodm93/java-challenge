@@ -1,11 +1,14 @@
 package com.ignaciodm.challenge.controllers;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -17,11 +20,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
 import org.springframework.data.redis.core.ReactiveValueOperations;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 import com.ignaciodm.challenge.models.SellingCost;
 import com.ignaciodm.challenge.repository.SellingCostRepository;
 import com.ignaciodm.challenge.service.PathsService;
 
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -41,7 +46,13 @@ public class SellingCostControllerTest {
 	private ReactiveValueOperations<String, Map<Integer, Integer>> redisValueOps;
 
 	@Mock
+	private ReactiveValueOperations<String, Map<String, Object>> redisValueOpsForCheapestPath;
+
+	@Mock
 	private ReactiveRedisTemplate<String, Map<Integer, Integer>> redisTemplateSellingCost;
+
+	@Mock
+	private ReactiveRedisTemplate<String, Map<String, Object>> redisTemplateForCheapestPath;
 
 	@BeforeEach
 	void setup() {
@@ -125,9 +136,45 @@ public class SellingCostControllerTest {
 				.expectNextMatches(response -> response.getStatusCode().is2xxSuccessful()).verifyComplete();
 	}
 
-//	@Test
-//	public void getDirectConnectionsTest() {
-//		when(redisTemplateSellingCost.opsForValue()).thenReturn(redisValueOps);
-//		StepVerifier.create(sellingCostController.getDirectConnections(1));
-//	}
+	@Test
+	public void getDirectConnectionsTest() {
+		String redisKey = "directConnections:" + 1;
+		when(redisTemplateSellingCost.opsForValue()).thenReturn(redisValueOps);
+		when(redisValueOps.get(redisKey)).thenReturn(Mono.just(Map.of(2, 100)));
+		when(sellingCostRepository.findByStartingPoint(1)).thenReturn(Flux.just(new SellingCost(1, 2, 100)));
+		StepVerifier.create(sellingCostController.getDirectConnections(1)).expectNextMatches(
+				response -> response.getStatusCode().is2xxSuccessful() && response.getBody().equals(Map.of(2, 100)))
+				.verifyComplete();
+	}
+
+	@Test
+	public void getDirectConnectionsWhenNOtIntRedis() {
+		Integer startingPoint = 1;
+		String redisKey = "directConnections:" + startingPoint;
+		when(redisTemplateSellingCost.opsForValue()).thenReturn(redisValueOps);
+		when(redisValueOps.get(redisKey)).thenReturn(Mono.empty());
+		when(sellingCostRepository.findByStartingPoint(startingPoint))
+				.thenReturn(Flux.just(new SellingCost(1, 2, 100), new SellingCost(1, 3, 200)));
+		when(redisValueOps.set(eq(redisKey), eq(Map.of(2, 100, 3, 200)), any())).thenReturn(Mono.just(true));
+		StepVerifier.create(sellingCostController.getDirectConnections(startingPoint))
+				.expectNextMatches(response -> response.getStatusCode().is2xxSuccessful()
+						&& response.getBody().equals(Map.of(2, 100, 3, 200)))
+				.verifyComplete();
+	}
+
+	@Test
+	public void getFullCheapestPathTest() {
+		Integer startingPoint = 1;
+		Integer endingPoint = 3;
+		String redisKey = "cheapestPath:1-3";
+		List<SellingCost> sellingPoints = List.of(new SellingCost(1, 2, 50), new SellingCost(2, 3, 50));
+		Map<String, Object> mockedResult = Map.of("path", List.of(1, 2, 3), "cost", 100);
+		when(redisTemplateForCheapestPath.opsForValue()).thenReturn(redisValueOpsForCheapestPath);
+		when(redisValueOpsForCheapestPath.get(redisKey)).thenReturn(Mono.empty());
+		when(sellingCostRepository.findAll()).thenReturn(Flux.fromIterable(sellingPoints));
+		when(pathsService.getFullCheapestPath(any(Map.class), anyInt(), anyInt())).thenReturn(Mono.just(mockedResult));
+		when(redisValueOpsForCheapestPath.set(anyString(), anyMap(), any())).thenReturn(Mono.just(true));
+		StepVerifier.create(sellingCostController.getFullCheapestPath(startingPoint, endingPoint))
+				.expectNext(ResponseEntity.ok(Map.of("cost", 100, "path", List.of(1, 2, 3)))).verifyComplete();
+	}
 }
