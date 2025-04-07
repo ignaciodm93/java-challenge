@@ -101,4 +101,33 @@ public class SellingCostControllerTest {
 		StepVerifier.create(sellingCostController.updateSellingCost(1, 2, new SellingCost(1, 2, 100)));
 	}
 
+	@Test
+	public void deleteSellingCostWhenEmptyTest() {
+		SellingCost sellingCost = new SellingCost();
+
+		when(sellingCostRepository.findByStartingPointAndEndingPoint(1, 2)).thenReturn(Mono.just(sellingCost));
+		when(sellingCostRepository.delete(sellingCost)).thenReturn(Mono.empty());
+
+		StepVerifier.create(sellingCostController.deleteSellingCost(1, 2));
+	}
+
+	@Test
+	public void deleteSellingCostTest() {
+		SellingCost sellingCost = new SellingCost();
+		Map<Integer, Integer> redisMap = new HashMap<>();
+		redisMap.put(2, 100);
+		when(sellingCostRepository.findByStartingPointAndEndingPoint(1, 2)).thenReturn(Mono.just(sellingCost));
+		when(sellingCostRepository.delete(sellingCost)).thenReturn(Mono.empty());
+		when(redisTemplateSellingCost.opsForValue()).thenReturn(redisValueOps);
+		when(redisValueOps.get("directConnections:" + 1)).thenReturn(Mono.just(redisMap));
+		when(redisTemplateSellingCost.delete("directConnections:" + 1)).thenReturn(Mono.empty());
+		StepVerifier.create(sellingCostController.deleteSellingCost(1, 2))
+				.expectNextMatches(response -> response.getStatusCode().is2xxSuccessful()).verifyComplete();
+	}
+
+//	@Test
+//	public void getDirectConnectionsTest() {
+//		when(redisTemplateSellingCost.opsForValue()).thenReturn(redisValueOps);
+//		StepVerifier.create(sellingCostController.getDirectConnections(1));
+//	}
 }
