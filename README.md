@@ -1,24 +1,48 @@
 # Java Challenge
 
-Proyecto con Docker y Spring Boot para gestionar puntos de venta y costos de rutas, utilizando Redis como caché.
+Proyecto realizado con **Spring Boot** y **Docker**, orientado a la gestión de puntos de venta y costos de rutas, utilizando **Redis** como sistema de caché.
+
+---
 
 ## Tecnologías Utilizadas
 
-Spring Boot: Para la creación rápida de aplicaciones web y gestión de sus endpoints.  
-Spring WebFlux: Para la programación reactiva y permitir alto flujo de solicitudes. Si bien en este proyecto no se refleja su diferencial por el contexto de prueba en el que está hecho, se desarrolló teniendo en cuenta esta característica como se solicita en el ejercicio.
-Redis Template: Para el manejo de la caché de datos. Inicialmente se consideró Redisson pero terminé decantandome por RedisTemplate por su integración directa con Spring Data Redis y el enfoque más simple, permitiendo un control preciso de Redis sin la complejidad adicional de la primera opción. Adicionalmente, se intentaron usar algunas annotations para el manejo de la actualización de la cache pero fui obteniendo algunos errores que, por lo que estuve investigando, se debían a que no eran 100% no bloqueantes, por lo que también apoyó la idea de pasar a redis template que tiene un uso más manual y que me permitía revisar el flujo paso a paso. 
-Docker y Docker compose: Para la contenerización y gestión de servicios.  
-Maven: Para la gestión de dependencias.  
-JUnit 5 y Mockito: Para las pruebas unitarias.  
-SpringDoc (Swagger): Para la documentación de la API.  
-Java 23: El lenguaje de programación utilizado.
+- **Java 23** – Lenguaje principal del proyecto.  
+  Por mencionar algunas adiciones de esta versión, aunque no se usen en este proyecto:
+    
+    - *Scoped Values*: alternativa más segura y performante que ThreadLocal para pasar datos inmutables entre métodos y subprocesos, especialmente útil en aplicaciones concurrentes o reactivas.
+    - *Structured Concurrency*: propone una forma moderna y más segura de manejar tareas concurrentes agrupándolas como una sola unidad de trabajo.
+    - *Stream Gatherers*: extiende el API de Streams para permitir operaciones intermedias personalizadas más expresivas.
+	
+- **Spring Boot** – Creación y configuración rápida de aplicaciones web.  
+- **Spring WebFlux** – Soporte para programación reactiva y alta concurrencia.  
+   Aunque en este caso de prueba no se explotan a fondo las ventajas de WebFlux, el proyecto fue diseñado teniéndolas en cuenta, como requería el ejercicio.
+- **RedisTemplate** – Manejo manual de caché con Redis.  
+   - Inicialmente se evaluó **Redisson**, pero se optó por RedisTemplate por su mejor integración con **Spring Data Redis** y menor complejidad.
+   - También se probaron anotaciones automáticas para cacheo, pero presentaron problemas relacionados con operaciones bloqueantes, lo cual motivó aún más el uso manual vía template para mantener el flujo reactivo.
+- **Docker & Docker Compose** – Contenerización y gestión de servicios. Usados para ejecutar la app y sus servicios de forma aislada y fácil de levantar.
+- **MongoDB** – Base de datos no relacional para persistencia de datos.  
+- **Maven** – Herramienta para manejar las dependencias, compilar el proyecto y correr los tests. También se usa para empaquetar la aplicación y gestionarla durante el desarrollo.  
+- **JUnit 5 & Mockito** – Frameworks para testing unitario. JUnit 5 se usa para escribir y ejecutar los tests, y Mockito para simular dependencias y probar cada parte por separado. Son útiles para asegurarse de que todo funciona como se espera.
+- **SpringDoc (Swagger)** – Generación automática de documentación de la API REST.
 
-#Comandos/consideraciones para levantar con Docker:
+---
+
+## Consideraciones particulares para Ejecutar el Proyecto
+
+### De forma local:
+
+- Tener instalados:
+  - **Redis**
+  - **MongoDB**
+
+### Con Docker:
+
+- Tener instalado:
+  - **Docker**
+  
+- Correr:
+
+```bash
 mvn clean compile
 mvn clean package
 docker-compose up --build
-
-Tener Redis, Docker y Mongo instalado.
-
---corregir tests luego de los cambios subidos
---ver si puedo pasarlo a postman
