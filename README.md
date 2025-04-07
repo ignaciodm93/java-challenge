@@ -13,5 +13,12 @@ JUnit 5 y Mockito: Para las pruebas unitarias.
 SpringDoc (Swagger): Para la documentación de la API.  
 Java 23: El lenguaje de programación utilizado.
 
+#Comandos/consideraciones para levantar con Docker:
+mvn clean compile
+mvn clean package
+docker-compose up --build
+
+Tener Redis, Docker y Mongo instalado.
+
 --corregir tests luego de los cambios subidos
 --ver si puedo pasarlo a postman
