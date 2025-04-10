@@ -36,6 +36,14 @@ import reactor.core.publisher.Mono;
 @RequestMapping("/selling-costs")
 public class SellingCostController implements SellingCostApi {
 
+	private static final String HYPHEN = "-";
+
+	private static final String CHEAPEST_PATH = "cheapestPath:";
+
+	private static final String DIRECT_CONNECTIONS = "directConnections:";
+
+	private static final String INITIAL_SELLING_COSTS_SAVED_SUCCESSFULLY_AND_CACHED_IN_REDIS = "Initial selling costs saved successfully and cached in Redis.";
+
 	private static final int REDIS_TTL = 300;
 
 	@Autowired
@@ -81,7 +89,7 @@ public class SellingCostController implements SellingCostApi {
 	public Mono<ResponseEntity<SellingCost>> updateSellingCost(@PathVariable Integer startingPoint,
 			@PathVariable Integer endingPoint, @RequestBody SellingCost sellingCost) {
 
-		String redisKey = "directConnections:" + startingPoint;
+		String redisKey = DIRECT_CONNECTIONS + startingPoint;
 
 		return sellingCostDocumentRepository.findByStartingPointAndEndingPoint(startingPoint, endingPoint)
 				.flatMap(existingSellingCost -> {
@@ -110,7 +118,7 @@ public class SellingCostController implements SellingCostApi {
 	public Mono<ResponseEntity<Object>> deleteSellingCost(@PathVariable Integer startingPoint,
 			@PathVariable Integer endingPoint) {
 
-		String redisKey = "directConnections:" + startingPoint;
+		String redisKey = DIRECT_CONNECTIONS + startingPoint;
 
 		return sellingCostDocumentRepository.findByStartingPointAndEndingPoint(startingPoint, endingPoint)
 				.flatMap(existingSellingCost -> {
@@ -131,7 +139,7 @@ public class SellingCostController implements SellingCostApi {
 	@GetMapping("/direct-connections/{startingPoint}")
 	public Mono<ResponseEntity<Map<Integer, Integer>>> getDirectConnections(@PathVariable Integer startingPoint) {
 
-		String redisKey = "directConnections:" + startingPoint;
+		String redisKey = DIRECT_CONNECTIONS + startingPoint;
 
 		return redisTemplateSellingCost.opsForValue().get(redisKey)
 				.switchIfEmpty(sellingCostDocumentRepository.findByStartingPoint(startingPoint)
@@ -149,14 +157,12 @@ public class SellingCostController implements SellingCostApi {
 	@GetMapping("/full-cheapest-path")
 	public Mono<ResponseEntity<Map<String, Object>>> getFullCheapestPath(@RequestParam Integer startingPoint,
 			@RequestParam Integer endingPoint) {
-		String key = "cheapestPath:" + startingPoint + "-" + endingPoint;
+		String key = CHEAPEST_PATH + startingPoint + HYPHEN + endingPoint;
 		Mono<ResponseEntity<Map<String, Object>>> redisMono = redisTemplateCheapestPath.opsForValue().get(key)
 				.map(ResponseEntity::ok);
 		Mono<ResponseEntity<Map<String, Object>>> mongoMono = getSellingPointsPaths().flatMap(sellingPointsPaths -> {
-			log.debug("Fetching full cheapest path from {} to {}", startingPoint, endingPoint);
 			return integratedPathService.getFullCheapestPath(sellingPointsPaths, startingPoint, endingPoint)
 					.doOnNext(pathAndFare -> {
-						log.debug("Cheapest path found: {}", pathAndFare);
 					}).flatMap(pathAndFare -> {
 						return redisTemplateCheapestPath.opsForValue()
 								.set(key, pathAndFare, Duration.ofSeconds(REDIS_TTL))
@@ -182,7 +188,7 @@ public class SellingCostController implements SellingCostApi {
 					return redisTemplateCheapestPath.opsForValue()
 							.set(redisKey, sellingCostMap, Duration.ofSeconds(300))
 							.thenReturn(ResponseEntity.status(HttpStatus.CREATED)
-									.body("Initial selling costs saved successfully and cached in Redis."));
+									.body(INITIAL_SELLING_COSTS_SAVED_SUCCESSFULLY_AND_CACHED_IN_REDIS));
 				}));
 	}
 

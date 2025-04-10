@@ -24,6 +24,10 @@ import reactor.core.publisher.Mono;
 @Service
 public class JwtService {
 
+	private static final String PASARON_30_MINS = "Pasaron 30 mins...";
+
+	private static final String ESPERANDO_30_MINUTOS_PARA_QUE_EL_TOKEN_EXPIRE = "Esperando 30 minutos para que el token expire...";
+
 	private static final String ROLE_ = "ROLE_";
 
 	private static final String ROLE = "role";
@@ -47,10 +51,10 @@ public class JwtService {
 
 	private void expirationTest() {
 		new Thread(() -> {
-			System.out.println("Esperando 30 minutos para que el token expire...");
+			System.out.println(ESPERANDO_30_MINUTOS_PARA_QUE_EL_TOKEN_EXPIRE);
 			try {
 				Thread.sleep(1800000);
-				System.out.println("Pasaron 30 mins...");
+				System.out.println(PASARON_30_MINS);
 			} catch (InterruptedException e) {
 			}
 		}).start();

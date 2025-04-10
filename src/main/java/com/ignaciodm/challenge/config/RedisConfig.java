@@ -17,7 +17,6 @@ import com.ignaciodm.challenge.models.SellingPoint;
 @Configuration
 public class RedisConfig {
 
-	// tempalte para string, sellingPoint
 	@Bean
 	public ReactiveRedisTemplate<String, SellingPoint> reactiveRedisTemplate(ReactiveRedisConnectionFactory factory) {
 		StringRedisSerializer keySerializer = new StringRedisSerializer();
@@ -30,7 +29,6 @@ public class RedisConfig {
 		return new ReactiveRedisTemplate<>(factory, serializationContext);
 	}
 
-	// template para integer integer
 	@Bean
 	public ReactiveRedisTemplate<String, Map<Integer, Integer>> reactiveRedisTemplateSellingCost(
 			ReactiveRedisConnectionFactory factory) {
@@ -46,7 +44,6 @@ public class RedisConfig {
 		return new ReactiveRedisTemplate<>(factory, serializationContext);
 	}
 
-	// template para string, object
 	@Bean
 	public ReactiveRedisTemplate<String, Map<String, Object>> reactiveRedisTemplateCheapestPath(
 			ReactiveRedisConnectionFactory factory) {

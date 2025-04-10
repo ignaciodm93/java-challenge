@@ -17,6 +17,7 @@ import reactor.core.publisher.Mono;
 @Component
 public class JwtAuthenticationFilter implements WebFilter {
 
+	private static final String EXPIRED_JWT_EXCEPTION = "ExpiredJwtException: ";
 	private static final String EXPIRED_TOKEN = "Token expirado :(";
 	private static final String INVALID_TOKEN = "Token inválido";
 	private static final String BEARER_PREFIX = "Bearer ";
@@ -44,10 +45,10 @@ public class JwtAuthenticationFilter implements WebFilter {
 									.withSecurityContext(Mono.just(context)));
 				});
 			} catch (ExpiredJwtException e) {
-				System.out.println("ExpiredJwtException: " + EXPIRED_TOKEN);
+				System.out.println(EXPIRED_JWT_EXCEPTION + EXPIRED_TOKEN);
 				return Mono.error(new ResponseStatusException(HttpStatus.UNAUTHORIZED, EXPIRED_TOKEN)).cast(Void.class);
 			} catch (Exception e) {
-				System.out.println("ExpiredJwtException: " + INVALID_TOKEN);
+				System.out.println(EXPIRED_JWT_EXCEPTION + INVALID_TOKEN);
 				return Mono.error(new ResponseStatusException(HttpStatus.UNAUTHORIZED, INVALID_TOKEN)).cast(Void.class);
 			}
 		}
