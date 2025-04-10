@@ -4,7 +4,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextImpl;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.server.ResponseStatusException;
@@ -35,7 +34,7 @@ public class JwtAuthenticationFilter implements WebFilter {
 
 			try {
 				return jwtService.getAuthentication(jwt).flatMap(authentication -> {
-					if (!jwtService.isTokenValid(jwt, (UserDetails) authentication.getPrincipal())) {
+					if (!jwtService.isTokenValid(jwt, (String) authentication.getPrincipal())) {
 						return Mono.error(new ResponseStatusException(HttpStatus.UNAUTHORIZED)).cast(Void.class);
 					}
 

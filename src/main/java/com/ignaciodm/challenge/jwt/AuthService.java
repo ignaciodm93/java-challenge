@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import com.ignaciodm.challenge.models.AuthResponse;
 import com.ignaciodm.challenge.models.LoginRequest;
 import com.ignaciodm.challenge.models.RegisterRequest;
-import com.ignaciodm.challenge.models.Role;
 import com.ignaciodm.challenge.models.User;
 import com.ignaciodm.challenge.repository.UserRepository;
 
@@ -34,7 +33,7 @@ public class AuthService {
 
 	public Mono<AuthResponse> register(RegisterRequest req) {
 		User user = new User(req.getUsername(), req.getLastname(), req.getLastname(), req.getCountry(),
-				passwordEncoder.encode(req.getPassword()), Role.USER);// cambiar luego cuando se agrege admin
+				passwordEncoder.encode(req.getPassword()), req.getRole());
 
 		return userRepository.save(user).map(savedUser -> new AuthResponse(jwtService.generateToken(savedUser)));
 	}

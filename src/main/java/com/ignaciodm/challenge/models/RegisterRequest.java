@@ -2,11 +2,12 @@ package com.ignaciodm.challenge.models;
 
 public class RegisterRequest {
 
-	String username;
-	String password;
-	String firstname;
-	String lastname;
-	String country;
+	private String username;
+	private String password;
+	private String firstname;
+	private String lastname;
+	private String country;
+	private Role role;
 
 	public RegisterRequest(String username, String password, String firstname, String lastname, String country) {
 		this.username = username;
@@ -54,6 +55,14 @@ public class RegisterRequest {
 
 	public void setCountry(String country) {
 		this.country = country;
+	}
+
+	public Role getRole() {
+		return role;
+	}
+
+	public void setRole(Role role) {
+		this.role = role;
 	}
 
 }

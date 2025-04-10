@@ -2,9 +2,9 @@ package com.ignaciodm.challenge.models;
 
 public class LoginRequest {
 
-	String username;
+	private String username;
 
-	String password;
+	private String password;
 
 	public LoginRequest(String username, String password) {
 		this.username = username;

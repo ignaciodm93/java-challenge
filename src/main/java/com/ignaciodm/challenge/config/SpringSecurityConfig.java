@@ -23,14 +23,10 @@ public class SpringSecurityConfig {
 
 	@Bean
 	public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
-		return http
-				.csrf(csrf -> csrf
-						.disable())
-				.authorizeExchange(
-						exchanges -> exchanges.pathMatchers("/auth/login", "/auth/register", "/swagger-ui.html",
-								"/swagger-ui/**", "/v3/api-docs/**").permitAll().anyExchange().authenticated())
+		return http.csrf(csrf -> csrf.disable()).authorizeExchange(exchanges -> exchanges
+				.pathMatchers("/auth/login", "/auth/register", "/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**")
+				.permitAll().pathMatchers("/accreditations/**").hasRole("ADMIN").anyExchange().authenticated())
 				.addFilterAt(jwtAuthenticationFilter, SecurityWebFiltersOrder.AUTHENTICATION).build();
-		// cambiar luego cuando se agrege admin
 	}
 
 }

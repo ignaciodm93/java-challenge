@@ -2,13 +2,17 @@ package com.ignaciodm.challenge.jwt;
 
 import java.security.Key;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
+
+import com.ignaciodm.challenge.models.User;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -20,23 +24,22 @@ import reactor.core.publisher.Mono;
 @Service
 public class JwtService {
 
+	private static final String ROLE_ = "ROLE_";
+
+	private static final String ROLE = "role";
+
 	@Value("${jwt.secret}")
 	private String secret_key;
 
-	private static final long EXPIRATION = 120000; // ver si despues lo cambio por 3600000
+	private static final long EXPIRATION = 1800000; // 120000 2 mins para pruebas, 1800000 30min
 
-	private final ReactiveUserDetailsService userDetailsService;
-
-	public JwtService(ReactiveUserDetailsService userDetailsService) {
-		this.userDetailsService = userDetailsService;
-	}
-
-	public String generateToken(UserDetails userDetails) {
-		String token = Jwts.builder().setSubject(userDetails.getUsername())
+	public String generateToken(User userDetails) {
+		Map<String, Object> claims = new HashMap<>();
+		claims.put(ROLE, userDetails.getRole().name());
+		String token = Jwts.builder().setClaims(claims).setSubject(userDetails.getUsername())
 				.setIssuedAt(new Date(System.currentTimeMillis()))
 				.setExpiration(new Date(System.currentTimeMillis() + EXPIRATION))
 				.signWith(getSignKey(), SignatureAlgorithm.HS256).compact();
-		// agregar luego el claim para admin
 		expirationTest();
 
 		return token;
@@ -44,10 +47,10 @@ public class JwtService {
 
 	private void expirationTest() {
 		new Thread(() -> {
-			System.out.println("Esperando 2 minutos para que el token expire...");
+			System.out.println("Esperando 30 minutos para que el token expire...");
 			try {
-				Thread.sleep(120000);
-				System.out.println("Pasaron 2 mins...");
+				Thread.sleep(1800000);
+				System.out.println("Pasaron 30 mins...");
 			} catch (InterruptedException e) {
 			}
 		}).start();
@@ -61,9 +64,9 @@ public class JwtService {
 		return Jwts.parserBuilder().setSigningKey(getSignKey()).build().parseClaimsJws(token).getBody();
 	}
 
-	public boolean isTokenValid(String token, UserDetails userDetails) {
-		final String username = extractUsername(token);
-		return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
+	public boolean isTokenValid(String token, String username) {
+		final String extractedUsername = extractUsername(token);
+		return extractedUsername.equals(username) && !isTokenExpired(token);
 	}
 
 	private boolean isTokenExpired(String token) {
@@ -80,8 +83,11 @@ public class JwtService {
 	}
 
 	public Mono<Authentication> getAuthentication(String token) {
-		String username = extractUsername(token);
-		return userDetailsService.findByUsername(username)
-				.map(user -> new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities()));
+		Claims claims = extractAllClaims(token);
+		String username = claims.getSubject();
+		String role = claims.get(ROLE, String.class);
+		SimpleGrantedAuthority authority = new SimpleGrantedAuthority(ROLE_ + role);
+		return Mono.just(new UsernamePasswordAuthenticationToken(username, null, List.of(authority)));
 	}
+
 }
