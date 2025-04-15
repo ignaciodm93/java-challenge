@@ -45,7 +45,7 @@ public class SellingCostController implements SellingCostApi {
 	private static final String INITIAL_SELLING_COSTS_SAVED_SUCCESSFULLY_AND_CACHED_IN_REDIS = "Initial selling costs saved successfully and cached in Redis.";
 
 	private static final int REDIS_TTL = 300;
-
+	private static final int REDIS_TTL_SHORT = 10;
 	@Autowired
 	private PathsService integratedPathService;
 
@@ -165,7 +165,7 @@ public class SellingCostController implements SellingCostApi {
 					.doOnNext(pathAndFare -> {
 					}).flatMap(pathAndFare -> {
 						return redisTemplateCheapestPath.opsForValue()
-								.set(key, pathAndFare, Duration.ofSeconds(REDIS_TTL))
+								.set(key, pathAndFare, Duration.ofSeconds(REDIS_TTL_SHORT))
 								.thenReturn(ResponseEntity.ok(pathAndFare));
 					});
 		});

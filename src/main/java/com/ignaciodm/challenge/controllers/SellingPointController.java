@@ -71,10 +71,10 @@ public class SellingPointController implements SellingPointApi {
 		});
 	}
 
-	@PostMapping("/initial-data")
-	public Mono<ResponseEntity<Void>> saveInitialData() {
-		return sellingPointService.saveInitialData().then(Mono.just(ResponseEntity.ok().build()));
-	}
+//	@PostMapping("/initial-data")
+//	public Mono<ResponseEntity<Void>> saveInitialData() {
+//		return sellingPointService.saveInitialData().then(Mono.just(ResponseEntity.ok().build()));
+//	}
 
 	@DeleteMapping("/flush-all")
 	public Mono<ResponseEntity<Void>> clearCache() {

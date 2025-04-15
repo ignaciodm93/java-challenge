@@ -8,4 +8,6 @@ import reactor.core.publisher.Mono;
 
 public interface SellingPointRepository extends ReactiveMongoRepository<SellingPoint, Integer> {
 	Mono<SellingPoint> findById(Integer id);
+
+	Mono<Void> deleteAll();
 }

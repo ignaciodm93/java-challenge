@@ -18,7 +18,7 @@ public class AccreditationsController implements AccreditationsApi {
 
 	private static final String ACCREDITATION_POINT_TO_GET_NOT_FOUND = "Accreditation point to get not found.";
 
-	private static final String SELLING_POINT_NOT_FOUND_IN_CACHE_TRY_ANOTHER_ONE_OR_UPDATE_THE_CACHE = "Selling point not found in cache, try another one or update the cache.";
+	private static final String SELLING_POINT_NOT_FOUND_IN_CACHE_TRY_ANOTHER_ONE_OR_UPDATE_THE_CACHE = "Selling point not found in cache, try another one or update the selling points list cache.";
 
 	@Autowired
 	private AccreditationsService accreditationsService;
