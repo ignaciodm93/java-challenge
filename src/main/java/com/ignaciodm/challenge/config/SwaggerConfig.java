@@ -1,6 +1,5 @@
 package com.ignaciodm.challenge.config;
 
-import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -15,15 +14,8 @@ public class SwaggerConfig {
 
 	private static final String VERSION = "1.0";
 	private static final String BEARER_AUTH = "bearerAuth";
-	private static final String WILDCARD_MATCHER = "/**";
-	private static final String PUBLIC = "public";
 	private static final String JWT = "JWT";
 	private static final String BEARER = "bearer";
-
-	@Bean
-	public GroupedOpenApi publicApi() {
-		return GroupedOpenApi.builder().group(PUBLIC).pathsToMatch(WILDCARD_MATCHER).build();
-	}
 
 	@Bean
 	public OpenAPI customOpenAPI() {

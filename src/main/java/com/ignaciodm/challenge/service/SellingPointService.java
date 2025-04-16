@@ -33,7 +33,7 @@ public class SellingPointService {
 	private static final String TRYING_TO_GET_SELLING_POINTS_FROM_REDIS = "Trying to get selling points from Redis.";
 
 	private static final int REDIS_TTL = 3600;
-	private static final int REDIS_TTL_SHORT = 15;
+	private static final int REDIS_TTL_SHORT = 15;// para pruebas
 	@Autowired
 	private ReactiveRedisTemplate<String, SellingPoint> redisTemplate;
 
@@ -65,7 +65,7 @@ public class SellingPointService {
 
 		Mono<SellingPoint> mongoValue = sellingPointRepository.findById(id).flatMap(sellingPoint -> {
 			logger.info(LOG_SELLING_POINT_NOT_FOUNDED_ON_REDIS_GETTING_FROM_DB);
-			return redisTemplate.opsForValue().set(key, sellingPoint, Duration.ofSeconds(REDIS_TTL))
+			return redisTemplate.opsForValue().set(key, sellingPoint, Duration.ofSeconds(REDIS_TTL_SHORT))
 					.thenReturn(sellingPoint);
 		});
 
@@ -81,7 +81,7 @@ public class SellingPointService {
 					.then(sellingPointRepository.findAll().collectList().flatMap(sellingPoints -> {
 						return redisTemplate.opsForList().rightPushAll(REDIS_KEY_SELLING_POINTS_LIST, sellingPoints)
 								.then(redisTemplate.expire(REDIS_KEY_SELLING_POINTS_LIST,
-										Duration.ofSeconds(REDIS_TTL)));
+										Duration.ofSeconds(REDIS_TTL_SHORT)));
 					})).thenReturn(savedSellingPoint);
 		});
 	}
@@ -104,7 +104,7 @@ public class SellingPointService {
 						.then(sellingPointRepository.findAll().collectList().flatMap(sellingPoints -> {
 							return redisTemplate.opsForList().rightPushAll(REDIS_KEY_SELLING_POINTS_LIST, sellingPoints)
 									.then(redisTemplate.expire(REDIS_KEY_SELLING_POINTS_LIST,
-											Duration.ofSeconds(REDIS_TTL)));
+											Duration.ofSeconds(REDIS_TTL_SHORT)));
 						})).thenReturn(1L))
 				.switchIfEmpty(Mono.just(0L));
 	}
