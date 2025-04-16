@@ -6,6 +6,8 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 
 import com.ignaciodm.challenge.jwt.JwtAuthenticationFilter;
@@ -34,10 +36,14 @@ public class SpringSecurityConfig {
 	public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
 		return http.csrf(csrf -> csrf.disable())
 				.authorizeExchange(exchanges -> exchanges
-						.pathMatchers(AUTH_LOGIN, AUTH_REGISTER, SWAGGER_UI_HTML, SWAGGER_UI,
-								V3_API_DOCS, SWAGGER_RESOURCES, WEBJARS)
+						.pathMatchers(AUTH_LOGIN, AUTH_REGISTER, SWAGGER_UI_HTML, SWAGGER_UI, V3_API_DOCS,
+								SWAGGER_RESOURCES, WEBJARS)
 						.permitAll().pathMatchers(ACCREDITATIONS).hasRole(ADMIN).anyExchange().authenticated())
 				.addFilterAt(jwtAuthenticationFilter, SecurityWebFiltersOrder.AUTHENTICATION).build();
 	}
 
+	@Bean
+	public PasswordEncoder passwordEncoder() {
+		return new BCryptPasswordEncoder();
+	}
 }

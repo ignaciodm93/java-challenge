@@ -28,8 +28,6 @@ public class SellingPointService {
 
 	private static final String REDIS_KEY_SELLING_POINT_KEY = "sellingPoint:";
 
-	private static final String FOUNDED_DATA_ON_REDIS = "Founded data on Redis: ";
-
 	private static final String TRYING_TO_GET_SELLING_POINTS_FROM_REDIS = "Trying to get selling points from Redis.";
 
 	private static final int REDIS_TTL = 3600;
