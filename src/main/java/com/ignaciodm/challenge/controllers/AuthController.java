@@ -6,10 +6,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ignaciodm.challenge.jwt.AuthService;
 import com.ignaciodm.challenge.models.AuthResponse;
 import com.ignaciodm.challenge.models.LoginRequest;
 import com.ignaciodm.challenge.models.RegisterRequest;
+import com.ignaciodm.challenge.service.AuthService;
 
 import reactor.core.publisher.Mono;
 

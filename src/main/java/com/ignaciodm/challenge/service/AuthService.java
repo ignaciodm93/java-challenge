@@ -1,8 +1,9 @@
-package com.ignaciodm.challenge.jwt;
+package com.ignaciodm.challenge.service;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.ignaciodm.challenge.jwt.JwtService;
 import com.ignaciodm.challenge.models.AuthResponse;
 import com.ignaciodm.challenge.models.LoginRequest;
 import com.ignaciodm.challenge.models.RegisterRequest;
