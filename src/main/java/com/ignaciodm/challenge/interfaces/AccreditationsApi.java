@@ -1,4 +1,4 @@
-package com.ignaciodm.interfaces;
+package com.ignaciodm.challenge.interfaces;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
