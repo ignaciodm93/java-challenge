@@ -1,4 +1,4 @@
-package com.ignaciodm.interfaces;
+package com.ignaciodm.challenge.interfaces;
 
 import java.util.Map;
 

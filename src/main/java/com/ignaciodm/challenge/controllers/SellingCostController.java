@@ -23,10 +23,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ignaciodm.challenge.interfaces.SellingCostApi;
 import com.ignaciodm.challenge.models.SellingCost;
 import com.ignaciodm.challenge.repository.SellingCostRepository;
 import com.ignaciodm.challenge.service.PathsService;
-import com.ignaciodm.interfaces.SellingCostApi;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;

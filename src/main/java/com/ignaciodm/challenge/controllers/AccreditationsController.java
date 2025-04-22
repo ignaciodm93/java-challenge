@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ignaciodm.challenge.interfaces.AccreditationsApi;
 import com.ignaciodm.challenge.service.AccreditationsService;
-import com.ignaciodm.interfaces.AccreditationsApi;
 
 import reactor.core.publisher.Mono;
 
