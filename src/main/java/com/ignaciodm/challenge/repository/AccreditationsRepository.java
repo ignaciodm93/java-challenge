@@ -5,11 +5,11 @@ import org.springframework.stereotype.Repository;
 
 import com.ignaciodm.challenge.models.AccreditationDocument;
 
-import reactor.core.publisher.Mono;
+import reactor.core.publisher.Flux;
 
 @Repository
 public interface AccreditationsRepository extends ReactiveMongoRepository<AccreditationDocument, String> {
 
-	Mono<AccreditationDocument> findBySellingPointId(Integer accreditationSellingPointId);
+	Flux<AccreditationDocument> findBySellingPointId(Integer accreditationSellingPointId);
 
 }

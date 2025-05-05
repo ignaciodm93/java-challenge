@@ -99,6 +99,7 @@ public class SellingPointService {
 		return sellingPointRepository.findById(id)
 				.flatMap(existingSellingPoint -> sellingPointRepository.deleteById(id)
 						.then(redisTemplate.delete(REDIS_KEY_SELLING_POINT_KEY + id))
+						.then(redisTemplate.delete(REDIS_KEY_SELLING_POINTS_LIST))
 						.then(sellingPointRepository.findAll().collectList().flatMap(sellingPoints -> {
 							return redisTemplate.opsForList().rightPushAll(REDIS_KEY_SELLING_POINTS_LIST, sellingPoints)
 									.then(redisTemplate.expire(REDIS_KEY_SELLING_POINTS_LIST,

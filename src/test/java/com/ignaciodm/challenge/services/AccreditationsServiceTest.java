@@ -3,6 +3,8 @@ package com.ignaciodm.challenge.services;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import java.time.LocalDateTime;
+
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -51,9 +53,16 @@ public class AccreditationsServiceTest {
 	}
 
 	@Test
-	public void findByAccreditationIdTest() {
-		when(accreditationsRepository.findBySellingPointId(1)).thenReturn(Mono.just(new AccreditationDocument()));
-		StepVerifier.create(accreditationsService.findByAccreditationId(1)).expectNextMatches(doc -> doc != null)
+	public void findByAccreditationIdTest_ReturnsLatest() {
+		AccreditationDocument doc1 = new AccreditationDocument();
+		doc1.setReceptionDate(LocalDateTime.now().minusDays(2));
+		AccreditationDocument doc2 = new AccreditationDocument();
+		doc2.setReceptionDate(LocalDateTime.now());
+		AccreditationDocument doc3 = new AccreditationDocument();
+		doc3.setReceptionDate(LocalDateTime.now().minusDays(1));
+		when(accreditationsRepository.findBySellingPointId(1)).thenReturn(Flux.just(doc1, doc3, doc2));
+		StepVerifier.create(accreditationsService.findByAccreditationId(1))
+				.expectNextMatches(doc -> doc != null && doc.getReceptionDate().equals(doc2.getReceptionDate()))
 				.verifyComplete();
 	}
 

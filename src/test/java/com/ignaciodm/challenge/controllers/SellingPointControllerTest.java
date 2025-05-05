@@ -75,7 +75,7 @@ public class SellingPointControllerTest {
 	@Test
 	public void updateSellingPointTest() {
 		when(sellingPointService.update(1, mockSellingPoint)).thenReturn(Mono.just(mockSellingPoint));
-		StepVerifier.create(sellingPointsController.updateSellingPoint(1, mockSellingPoint));
+		StepVerifier.create(sellingPointsController.updateOrCreateSellingPoint(1, mockSellingPoint));
 	}
 
 	@Test

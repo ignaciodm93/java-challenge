@@ -53,7 +53,7 @@ public class SellingPointController implements SellingPointApi {
 	}
 
 	@PutMapping("/{id}")
-	public Mono<ResponseEntity<SellingPoint>> updateSellingPoint(@PathVariable Integer id,
+	public Mono<ResponseEntity<SellingPoint>> updateOrCreateSellingPoint(@PathVariable Integer id,
 			@RequestBody SellingPoint sellingPoint) {
 		return sellingPointService.update(id, sellingPoint)
 				.map(updatedSellingPoint -> ResponseEntity.ok(updatedSellingPoint))

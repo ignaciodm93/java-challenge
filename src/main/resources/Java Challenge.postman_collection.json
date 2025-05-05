@@ -1,0 +1,594 @@
+{
+	"info": {
+		"_postman_id": "9b0caeba-c029-470c-b469-daeb191fa7a7",
+		"name": "Java Challenge",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "7673505"
+	},
+	"item": [
+		{
+			"name": "login user",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"username\": \"nachoprueba\",\r\n  \"password\": \"banco123\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/auth/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "login admin",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"username\": \"usuarioAdmin\",\r\n  \"password\": \"banco123\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/auth/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "registro user",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"username\": \"usuarioUser\",\r\n  \"password\": \"banco123\",\r\n  \"firstname\": \"nacho\",\r\n  \"lastname\": \"user\",\r\n  \"country\": \"Uruguay\",\r\n  \"role\": \"USER\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/auth/register",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"auth",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "registro admin",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"username\": \"usuarioAdmin\",\r\n  \"password\": \"banco123\",\r\n  \"firstname\": \"nacho\",\r\n  \"lastname\": \"admin\",\r\n  \"country\": \"Argentina\",\r\n  \"role\": \"ADMIN\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/auth/register",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"auth",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "selling-points",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiVVNFUiIsInN1YiI6InVzdWFyaW9Vc2VyIiwiaWF0IjoxNzQ0Mjk2NTg4LCJleHAiOjE3NDQyOTgzODh9.Lpiq64rpEeOpnDmLdOBF_p-ny0yk5LK5QbXrYOZ2KME",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/selling-points",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"selling-points"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "selling-point findSellingPointById",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiVVNFUiIsInN1YiI6InVzdWFyaW9Vc2VyIiwiaWF0IjoxNzQ0Mjk2NTg4LCJleHAiOjE3NDQyOTgzODh9.Lpiq64rpEeOpnDmLdOBF_p-ny0yk5LK5QbXrYOZ2KME",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/selling-points",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"selling-points"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "selling-point createSellingPoint",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiVVNFUiIsInN1YiI6InVzdWFyaW9Vc2VyIiwiaWF0IjoxNzQ0Mjk2NTg4LCJleHAiOjE3NDQyOTgzODh9.Lpiq64rpEeOpnDmLdOBF_p-ny0yk5LK5QbXrYOZ2KME",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/selling-points",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"selling-points"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "selling-point udpateOrCreateSellingPoint",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiVVNFUiIsInN1YiI6InVzdWFyaW9Vc2VyIiwiaWF0IjoxNzQ0Mjk2NTg4LCJleHAiOjE3NDQyOTgzODh9.Lpiq64rpEeOpnDmLdOBF_p-ny0yk5LK5QbXrYOZ2KME",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/selling-points",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"selling-points"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "selling-point deleteSellingPointById",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiVVNFUiIsInN1YiI6InVzdWFyaW9Vc2VyIiwiaWF0IjoxNzQ0Mjk2NTg4LCJleHAiOjE3NDQyOTgzODh9.Lpiq64rpEeOpnDmLdOBF_p-ny0yk5LK5QbXrYOZ2KME",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/selling-points",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"selling-points"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "selling-costs getAllSellingPointsPaths",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiVVNFUiIsInN1YiI6InVzdWFyaW9Vc2VyIiwiaWF0IjoxNzQ0Mjk2NTg4LCJleHAiOjE3NDQyOTgzODh9.Lpiq64rpEeOpnDmLdOBF_p-ny0yk5LK5QbXrYOZ2KME",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/selling-points",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"selling-points"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "selling-costs addSellingCost",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiVVNFUiIsInN1YiI6InVzdWFyaW9Vc2VyIiwiaWF0IjoxNzQ0Mjk2NTg4LCJleHAiOjE3NDQyOTgzODh9.Lpiq64rpEeOpnDmLdOBF_p-ny0yk5LK5QbXrYOZ2KME",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/selling-points",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"selling-points"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "selling-costs editExistingSellingCost",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiVVNFUiIsInN1YiI6InVzdWFyaW9Vc2VyIiwiaWF0IjoxNzQ0Mjk2NTg4LCJleHAiOjE3NDQyOTgzODh9.Lpiq64rpEeOpnDmLdOBF_p-ny0yk5LK5QbXrYOZ2KME",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/selling-points",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"selling-points"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "selling-point deleteSellingCostById",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiVVNFUiIsInN1YiI6InVzdWFyaW9Vc2VyIiwiaWF0IjoxNzQ0Mjk2NTg4LCJleHAiOjE3NDQyOTgzODh9.Lpiq64rpEeOpnDmLdOBF_p-ny0yk5LK5QbXrYOZ2KME",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/selling-points",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"selling-points"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getAccreditation (admin o user dependiendo del token)",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiQURNSU4iLCJzdWIiOiJ1c3VhcmlvQWRtaW4iLCJpYXQiOjE3NDQyOTY1MDMsImV4cCI6MTc0NDI5ODMwM30.VzBBkAzrEuIUPvpp1OE1Ye9dTafIbBTVBrun8Q4pDpM",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/accreditations/get/4",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"accreditations",
+						"get",
+						"4"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "saveAccreditation (admin o user dependiendo del token)",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiQURNSU4iLCJzdWIiOiJ1c3VhcmlvQWRtaW4iLCJpYXQiOjE3NDQyOTY1MDMsImV4cCI6MTc0NDI5ODMwM30.VzBBkAzrEuIUPvpp1OE1Ye9dTafIbBTVBrun8Q4pDpM",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/accreditations/get/4",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"accreditations",
+						"get",
+						"4"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

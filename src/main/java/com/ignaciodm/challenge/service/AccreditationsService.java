@@ -1,6 +1,7 @@
 package com.ignaciodm.challenge.service;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +41,7 @@ public class AccreditationsService {
 
 	public Mono<AccreditationDocument> findByAccreditationId(Integer accreditationId) {
 		return accreditationsRepository.findBySellingPointId(accreditationId)
+				.sort(Comparator.comparing(AccreditationDocument::getReceptionDate).reversed()).next()
 				.switchIfEmpty(Mono.just(new AccreditationDocument()));
 	}
 }

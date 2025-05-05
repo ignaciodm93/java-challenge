@@ -20,6 +20,10 @@ import reactor.core.publisher.Mono;
 
 public interface SellingPointApi {
 
+	public static final String NO_CONTENT = "No Content";
+	public static final String OK = "OK";
+	public static final String BAD_REQUEST_PLEASE_TRY_ANOTHER_IDENTIFIER = "Bad request, please try another identifier.";
+	public static final String CREATED = "Created";
 	String GET_ALL_SELLING_POINTS_VALUE = "Get all selling points";
 	String GET_ALL_SELLING_POINTS_NOTES = "Gets a list of all selling points.";
 	String GET_SELLING_POINT_BY_ID_VALUE = "Get a selling point by ID";
@@ -40,32 +44,34 @@ public interface SellingPointApi {
 	String SELLING_POINT_UPDATE_DESCRIPTION = "Selling point to update";
 
 	@Operation(summary = GET_ALL_SELLING_POINTS_VALUE, description = GET_ALL_SELLING_POINTS_NOTES, responses = {
-			@ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = SellingPoint.class))) })
+			@ApiResponse(responseCode = "200", description = OK, content = @Content(schema = @Schema(implementation = SellingPoint.class))) })
 	@GetMapping
 	Flux<SellingPoint> getAllSellingPoints();
 
 	@Operation(summary = GET_SELLING_POINT_BY_ID_VALUE, description = GET_SELLING_POINT_BY_ID_NOTES, responses = {
-			@ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = SellingPoint.class))),
+			@ApiResponse(responseCode = "200", description = OK, content = @Content(schema = @Schema(implementation = SellingPoint.class))),
 			@ApiResponse(responseCode = "404", description = SELLING_POINT_ID_NOT_FOUND, content = @Content(schema = @Schema(implementation = SellingPoint.class))) })
 	@GetMapping("/{id}")
 	Mono<ResponseEntity<SellingPoint>> getSellingPointById(
 			@Parameter(description = SELLING_POINT_ID_DESCRIPTION, required = true) @PathVariable Integer id);
 
 	@Operation(summary = CREATE_SELLING_POINT_VALUE, description = CREATE_SELLING_POINT_NOTES, responses = {
-			@ApiResponse(responseCode = "201", description = "Created", content = @Content(schema = @Schema(implementation = SellingPoint.class))) })
+			@ApiResponse(responseCode = "201", description = CREATED, content = @Content(schema = @Schema(implementation = SellingPoint.class))),
+			@ApiResponse(responseCode = "400", description = BAD_REQUEST_PLEASE_TRY_ANOTHER_IDENTIFIER, content = @Content(schema = @Schema(implementation = SellingPoint.class))) })
 	@PostMapping
 	Mono<ResponseEntity<SellingPoint>> createSellingPoint(
 			@Parameter(description = SELLING_POINT_CREATE_DESCRIPTION, required = true) @RequestBody SellingPoint sellingPoint);
 
 	@Operation(summary = UPDATE_SELLING_POINT_VALUE, description = UPDATE_SELLING_POINT_NOTES, responses = {
-			@ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = SellingPoint.class))),
+			@ApiResponse(responseCode = "200", description = OK, content = @Content(schema = @Schema(implementation = SellingPoint.class))),
 			@ApiResponse(responseCode = "404", description = SELLING_POINT_ID_NOT_FOUND, content = @Content(schema = @Schema(implementation = SellingPoint.class))) })
 	@PutMapping("/{id}")
-	Mono<ResponseEntity<SellingPoint>> updateSellingPoint(@PathVariable Integer id,
+	Mono<ResponseEntity<SellingPoint>> updateOrCreateSellingPoint(@PathVariable Integer id,
 			@Parameter(description = SELLING_POINT_UPDATE_DESCRIPTION, required = true) @RequestBody SellingPoint sellingPoint);
 
 	@Operation(summary = DELETE_SELLING_POINT_VALUE, description = DELETE_SELLING_POINT_NOTES, responses = {
-			@ApiResponse(responseCode = "204", description = "No Content", content = @Content(schema = @Schema(implementation = Void.class))) })
+			@ApiResponse(responseCode = "204", description = NO_CONTENT, content = @Content(schema = @Schema(implementation = Void.class))),
+			@ApiResponse(responseCode = "400", description = BAD_REQUEST_PLEASE_TRY_ANOTHER_IDENTIFIER, content = @Content(schema = @Schema(implementation = Void.class))) })
 	@DeleteMapping("/{id}")
 	Mono<ResponseEntity<Void>> deleteSellingPoint(
 			@Parameter(description = SELLING_POINT_ID_DESCRIPTION, required = true) @PathVariable Integer id);
