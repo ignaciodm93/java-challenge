@@ -32,7 +32,7 @@ public class SellingCostController implements SellingCostApi {
 	private SellingCostsService sellingCostService;
 
 	@GetMapping("/get-all-selling-points-paths")
-	private Mono<Map<Integer, Map<Integer, Integer>>> getSellingPointsPaths() {
+	public Mono<Map<Integer, Map<Integer, Integer>>> getSellingPointsPaths() {
 		return sellingCostService.getSellingPointsPaths();
 	}
 
